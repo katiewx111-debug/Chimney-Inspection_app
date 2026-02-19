@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuens Chimney Service – Inspection Forms</title>
+<style>
+  /* Offline-safe font substitutions */
+  .bebas { font-family: 'Impact', 'Arial Narrow', Arial, sans-serif; letter-spacing: 3px; }
+</style>
+<style>
+  :root {
+    --bg: #0f0f0e; --surface: #1a1917; --surface2: #242320;
+    --border: #2e2c28; --accent: #d4882a; --accent2: #e8a94a;
+    --text: #e8e4dc; --text-muted: #7a7567; --text-dim: #4a4740;
+    --red: #c45c3a; --radius: 4px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; height: 64px; position: sticky; top: 0; z-index: 100; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-text { font-family: 'Impact', 'Arial Narrow', Arial, sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--text); }
+  .logo-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; }
+
+  .selector-wrap { padding: 28px 24px 0; max-width: 960px; margin: 0 auto; }
+  .selector-label { font-family: 'Courier New', 'Menlo', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .form-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .form-tab { padding: 10px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-muted); cursor: pointer; font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 500; transition: all .15s; display: flex; align-items: center; gap: 8px; }
+  .form-tab:hover { border-color: var(--accent); color: var(--text); }
+  .form-tab.active { background: var(--accent); border-color: var(--accent); color: #0f0f0e; font-weight: 600; }
+  .tab-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.15); font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .form-tab.active .tab-num { background: rgba(0,0,0,.2); }
+
+  .main { max-width: 960px; margin: 24px auto; padding: 0 24px 80px; }
+  .form-container { display: none; }
+  .form-container.active { display: block; }
+
+  .form-header { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .form-header-left h1 { font-family: 'Impact', 'Arial Narrow', Arial, sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+  .form-header-left p { color: var(--text-muted); font-size: 12px; font-family: 'Courier New', 'Menlo', monospace; letter-spacing: 1px; }
+  .download-btn { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--accent); color: #0f0f0e; border: none; border-radius: var(--radius); font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all .15s; white-space: nowrap; letter-spacing: .5px; }
+  .download-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+  .section-header { background: var(--surface2); padding: 12px 20px; font-family: 'Impact', 'Arial Narrow', Arial, sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--accent); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .section-header .icon { font-size: 14px; opacity: .7; }
+  .section-body { padding: 20px; }
+
+  .subsection-title { font-family: 'Courier New', 'Menlo', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fields-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .fields-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .fields-grid.cols-1 { grid-template-columns: 1fr; }
+  @media(max-width:640px) { .fields-grid, .fields-grid.cols-3, .fields-grid.cols-4 { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field.span-2 { grid-column: span 2; }
+  .field.span-3 { grid-column: span 3; }
+  label { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: .5px; text-transform: uppercase; }
+  input[type=text], input[type=date], input[type=number], select, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 8px 12px; font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; transition: border-color .15s; width: 100%; -webkit-appearance: none; }
+  input[readonly] { color: var(--accent); font-weight: 600; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  select option { background: #1a1917; }
+  textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+  .hint { font-size: 10px; color: var(--text-dim); line-height: 1.4; margin-top: 2px; }
+
+  .cap-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+  .cap-card-title { font-family: 'Courier New', 'Menlo', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+  .check-group { display: flex; flex-direction: column; gap: 6px; }
+  .check-item { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; padding: 6px 8px; border-radius: var(--radius); border: 1px solid transparent; transition: all .1s; }
+  .check-item:hover { background: var(--surface2); border-color: var(--border); }
+  .check-item input[type=checkbox] { width: 15px; height: 15px; margin: 0; padding: 0; flex-shrink: 0; margin-top: 1px; accent-color: var(--accent); border: none; cursor: pointer; }
+  .check-item-content { flex: 1; }
+  .check-item-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .check-item-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+
+  .photo-upload-area { border: 1.5px dashed var(--border); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; transition: all .15s; background: var(--bg); }
+  .photo-upload-area:hover { border-color: var(--accent); background: rgba(212,136,42,.05); }
+  .photo-upload-area input { display: none; }
+  .photo-upload-icon { font-size: 24px; margin-bottom: 6px; opacity: .5; }
+  .photo-upload-text { font-size: 12px; color: var(--text-muted); }
+  .photo-upload-text strong { color: var(--accent); }
+  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 12px; }
+  .photo-thumb { position: relative; aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb .remove-photo { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,.7); border: none; border-radius: 50%; color: #fff; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  .sig-wrap { border: 1px solid var(--border); border-radius: var(--radius); background: #fff; overflow: hidden; }
+  .sig-canvas { display: block; width: 100%; height: 140px; cursor: crosshair; touch-action: none; }
+  .sig-controls { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface2); border-top: 1px solid var(--border); }
+  .sig-controls span { font-size: 11px; color: var(--text-muted); }
+  .sig-clear { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 10px; border-radius: var(--radius); font-size: 11px; cursor: pointer; transition: all .15s; }
+  .sig-clear:hover { border-color: var(--red); color: var(--red); }
+
+  .photo-section-label { font-family: 'Courier New', 'Menlo', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--accent); color: #0f0f0e; padding: 12px 20px; border-radius: var(--radius); font-weight: 600; font-size: 13px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all .3s; pointer-events: none; }
+  .toast.show { transform: none; opacity: 1; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* ── Print report styles ── */
+  #print-report { display: none; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-report, #print-report * { visibility: visible; }
+    #print-report { display: block !important; position: fixed; inset: 0; background: white; z-index: 99999; padding: 0; margin: 0; }
+    .pr-hdr { background: #1a1917 !important; color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: flex-start; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .pr-title { font-family: Impact, Arial, sans-serif; font-size: 18px; letter-spacing: 2px; color: #d4882a !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .pr-sub { font-size: 7px; color: #aaa !important; letter-spacing: 1px; margin-top: 2px; }
+    .pr-meta { text-align: right; font-size: 8px; color: #ccc !important; line-height: 1.6; }
+    .pr-bar { height: 3px; background: #d4882a !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .pr-sec { margin-top: 8px; page-break-inside: avoid; }
+    .pr-sec-hdr { background: #1a1917 !important; color: white !important; padding: 5px 10px; font-size: 8px; font-weight: 700; letter-spacing: 2px; border-left: 3px solid #d4882a; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .pr-table { width: 100%; border-collapse: collapse; }
+    .pr-tr { border-bottom: 1px solid #f0ede8; }
+    .pr-lbl { width: 38%; font-size: 7.5px; font-weight: 700; color: #888 !important; text-transform: uppercase; letter-spacing: .3px; padding: 5px 10px 4px; vertical-align: top; }
+    .pr-val { font-size: 10px; color: #1a1a1a !important; line-height: 1.5; padding: 4px 10px; vertical-align: top; }
+    .pr-photos { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px 10px; }
+    .pr-photo { width: calc(33% - 4px); aspect-ratio: 4/3; object-fit: cover; border-radius: 3px; border: 1px solid #ddd; }
+    .pr-footer { margin-top: 16px; border-top: 2px solid #1a1917; padding: 5px 10px; font-size: 7px; color: #888 !important; display: flex; justify-content: space-between; letter-spacing: 1px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div>
+      <div class="logo-text">NEUENS CHIMNEY</div>
+      <div class="logo-sub">Inspection Management System</div>
+    </div>
+  </div>
+</div><div class="selector-wrap">
+  <div class="selector-label">Select Inspection Type</div>
+  <div class="form-tabs">
+    <button class="form-tab active" onclick="switchForm(0)"><span class="tab-num">1</span> Masonry Fireplace</button>
+    <button class="form-tab" onclick="switchForm(1)"><span class="tab-num">2</span> Free Standing Appliance</button>
+    <button class="form-tab" onclick="switchForm(2)"><span class="tab-num">3</span> Factory Built Fireplace</button>
+    <button class="form-tab" onclick="switchForm(3)"><span class="tab-num">4</span> Wood Burning Insert</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== FORM 1: MASONRY FIREPLACE ===== -->
+<div class="form-container active" id="form-0">
+  <div class="form-header">
+    <div class="form-header-left"><h1>Masonry Fireplace Inspection</h1><p>CSIA Certified · Neuens Chimney Service LLC</p></div>
+    <button class="download-btn" onclick="downloadPDF(0)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save Report</button>
+  </div>
+
+  <div class="section" data-section="General Information">
+    <div class="section-header"><span class="icon">📋</span> General Information</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Date</label><input type="date" id="f0-date" oninput="setNextDate('f0')"></div>
+        <div class="field"><label>Technician</label>
+          <select id="f0-tech">
+            <option value="">Please Select</option>
+            <option>Katie Neuens: CSIA Certification # 11688</option>
+            <option>Ryan Walker: CSIA Certification # 12731</option>
+          </select>
+        </div>
+        <div class="field"><label>Level of Inspection</label>
+          <select id="f0-level">
+            <option value="">Please Select</option>
+            <option>Level 1 Inspection with aspects of Level 2</option>
+            <option>Level 2 Inspection</option>
+            <option>Level 3 Inspection</option>
+          </select>
+        </div>
+        <div class="field"><label>Client Name</label><input type="text" id="f0-client" placeholder="First Last"></div>
+        <div class="field span-2"><label>Property Address</label><input type="text" id="f0-addr1" placeholder="Street Address" style="margin-bottom:6px"><input type="text" id="f0-addr2" placeholder="City, State, Zip"></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Issues or Concerns with Your System?</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Drafting Problems / Smoke Coming In While Burning"><div class="check-item-content"><div class="check-item-label">Drafting Problems / Smoke Coming In While Burning</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Water Leaking"><div class="check-item-content"><div class="check-item-label">Water Leaking</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Visible Damage to Exterior Chimney"><div class="check-item-content"><div class="check-item-label">Visible Damage to Exterior Chimney</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gasket / Door Issues"><div class="check-item-content"><div class="check-item-label">Gasket / Door Issues</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Other"><div class="check-item-content"><div class="check-item-label">Other</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f0-gi-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Firebox">
+    <div class="section-header"><span class="icon">🧱</span> Firebox</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Type</label>
+          <select id="f0-fb-type"><option value="">Please Select</option><option>Masonry</option><option>Heatform Box</option></select>
+        </div>
+        <div class="field"><label>Lintel</label>
+          <select id="f0-lintel"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option><option>Not Present</option></select>
+        </div>
+        <div class="field"><label>Opening Height (inches)</label><input type="number" id="f0-oh" placeholder="e.g. 24" oninput="calcFireboxArea()"></div>
+        <div class="field"><label>Opening Length / Width (inches)</label><input type="number" id="f0-ol" placeholder="e.g. 36" oninput="calcFireboxArea()"></div>
+        <div class="field"><label>Area of Fire Box Opening — Auto Calculated</label><input type="text" id="f0-area" readonly placeholder="Enter Height &amp; Length above"></div>
+        <div class="field"><label>Fire Box Depth (inches)</label><input type="text" id="f0-depth" placeholder="Min 20 inches"><span class="hint">Min 20" depth. Rumford: 12" or at least 1/3 the width.</span></div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Firebox</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gap Where Firebox Meets Face of Fireplace"><div class="check-item-content"><div class="check-item-label">Gap Where Firebox Meets Face of Fireplace</div><div class="check-item-desc">Allows heat, sparks, gases and byproducts to travel behind facing material — must be sealed.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gaps/Cracks/Deteriorated Mortar Joints/Loose Brick"><div class="check-item-content"><div class="check-item-label">Gaps/Cracks/Deteriorated Mortar Joints/Loose Brick</div><div class="check-item-desc">Smallest gap creates pathway for flue gases. Refractory mortar required; joints not exceeding 1/4".</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Cracks (Heatform Firebox)"><div class="check-item-content"><div class="check-item-label">Cracks (Heatform Firebox)</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Warping/Rust Present"><div class="check-item-content"><div class="check-item-label">Warping/Rust Present</div><div class="check-item-desc">Signs of weakened metal — fire or CO threat.</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Throat Measurement</label><input type="text" id="f0-throat"></div>
+        <div class="field"><label>Does Throat Meet Min. 8" Above Opening &amp; 4" Deep?</label>
+          <select id="f0-throat-meet"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Damper Type</label>
+          <select id="f0-damper"><option value="">Please Select</option><option>Throat Damper</option><option>Top Mount Damper</option></select>
+        </div>
+        <div class="field"><label>Damper Condition</label>
+          <select id="f0-damper-cond"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f0-firebox-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="photo-section-label" style="margin-top:12px">📷 Firebox Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-fb-photos').click()">
+        <input type="file" id="f0-fb-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-fb-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> firebox photos</div>
+      </div>
+      <div class="photo-grid" id="f0-fb-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Hearth Extension">
+    <div class="section-header"><span class="icon">⬜</span> Hearth Extension</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Hearth Extension Front</label><input type="text" id="f0-he-front" placeholder="inches"><span class="hint">Min 16" front; 20" for openings &gt;6 sf</span></div>
+        <div class="field"><label>Hearth Extension Sides</label><input type="text" id="f0-he-sides" placeholder="inches"><span class="hint">Min 8" sides; 12" for openings &gt;6 sf</span></div>
+        <div class="field"><label>Min. Clearance to Combustibles Met</label>
+          <select id="f0-he-clear"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>General Condition of Hearth Extension</label>
+          <select id="f0-he-cond"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards: Contains Cracks/Gaps</option></select>
+        </div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Hearth Extension Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-hearth-photos').click()">
+        <input type="file" id="f0-hearth-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-hearth-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> hearth extension photos</div>
+      </div>
+      <div class="photo-grid" id="f0-hearth-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Fireplace Facing">
+    <div class="section-header"><span class="icon">🏠</span> Fireplace Facing</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Clearance to Mantle</label><input type="text" id="f0-mantle"><span class="hint">Min 6" + 1" per 1" of projection. Example: 8" projection requires 14" min clearance.</span></div>
+        <div class="field"><label>Clearance to Trim</label><input type="text" id="f0-trim"><span class="hint">Combustible trim min 6". Within 12" of opening: cannot project more than 1/8" per inch of distance.</span></div>
+        <div class="field"><label>Min. Clearance to Combustible Trim Met</label>
+          <select id="f0-trim-meet"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f0-facing-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Fireplace Facing Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-facing-photos').click()">
+        <input type="file" id="f0-facing-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-facing-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> fireplace facing photos</div>
+      </div>
+      <div class="photo-grid" id="f0-facing-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Smoke Chamber">
+    <div class="section-header"><span class="icon">💨</span> Smoke Chamber</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>General Condition of Smoke Chamber / Transition to Flue</label>
+          <select id="f0-smoke"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Contains Corbelling</option><option>Contains Cracks/Gaps/Holes</option></select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="f0-smoke-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Smoke Chamber Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-smoke-photos').click()">
+        <input type="file" id="f0-smoke-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-smoke-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> smoke chamber photos</div>
+      </div>
+      <div class="photo-grid" id="f0-smoke-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Chimney Flue">
+    <div class="section-header"><span class="icon">🔧</span> Chimney Flue</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field span-2"><label>Type of Flue</label>
+          <select id="f0-flue-kind"><option value="">Please Select</option><option>Clay Tile</option><option>Flexible Stainless / Aluminum</option><option>Rigid Stainless / Aluminum</option></select>
+          <span class="hint" style="color:var(--red);font-weight:600;margin-top:3px;">⚠ Wood burning inserts CANNOT be vented to clay tile</span>
+        </div>
+        <div class="field"><label>Flue Type</label>
+          <select id="f0-flue-type"><option value="">Please Select</option><option>Clay Tile</option><option>Cast Masonry</option><option>Flex</option><option>Rigid</option><option>No Liner Present</option></select>
+        </div>
+        <div class="field"><label>Interior Length (inches)</label><input type="number" id="f0-flue-len" oninput="calcFlueArea()"></div>
+        <div class="field"><label>Interior Width (inches)</label><input type="number" id="f0-flue-wid" oninput="calcFlueArea()"></div>
+        <div class="field"><label>Area of Flue (sq in) — Auto Calculated</label><input type="text" id="f0-flue-area" readonly placeholder="Enter Length &amp; Width above"></div>
+        <div class="field"><label>Outside Flue Length (inches)</label><input type="text" id="f0-flue-out-len"></div>
+        <div class="field"><label>Outside Flue Width (inches)</label><input type="text" id="f0-flue-out-wid"></div>
+        <div class="field"><label>Height of Flue</label><input type="text" id="f0-flue-ht"></div>
+        <div class="field"><label>Appropriateness of Liner Type for Appliance</label>
+          <select id="f0-liner-appr"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Flue Appropriately Sized?</label>
+          <select id="f0-flue-sized"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Insulation Present</label>
+          <select id="f0-insul"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Unknown</option></select>
+        </div>
+        <div class="field"><label>Level of Cleanliness: Soot</label>
+          <select id="f0-soot"><option value="">Please Select</option><option>Light — less than 1/8"</option><option>Moderate — 1/8" or more</option><option>Significant</option></select>
+        </div>
+        <div class="field"><label>Level of Cleanliness: Creosote</label>
+          <select id="f0-creo"><option value="">Please Select</option><option>1st Degree</option><option>2nd Degree</option><option>3rd Degree</option><option>Ignited</option></select>
+        </div>
+        <div class="field span-2"><label>Flue Blockages or Obstructions</label><textarea id="f0-block" placeholder="Describe any blockages..."></textarea></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Flue Tile: General Condition</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Broken Flue Tiles"><div class="check-item-content"><div class="check-item-label">Broken Flue Tiles</div><div class="check-item-desc">Indication of sudden rapid heating. Tile can no longer perform its intended function. Chimney must be relined.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Misaligned Flue Tiles"><div class="check-item-content"><div class="check-item-label">Misaligned Flue Tiles</div><div class="check-item-desc">Can allow harmful combustion byproducts to escape to unintended areas.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Spalling/Flaking Tiles"><div class="check-item-content"><div class="check-item-label">Spalling/Flaking Tiles</div><div class="check-item-desc">Tile softened or degraded; can no longer contain byproducts. Must be repaired or relined.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Missing Mortar Joints"><div class="check-item-content"><div class="check-item-label">Missing Mortar Joints</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Excessive Offset Present (>15–30°)"><div class="check-item-content"><div class="check-item-label">Excessive Offset Present</div><div class="check-item-desc">Offset &gt;15°–30° affects draft and ability to convey byproducts to exterior.</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Flue Cleanout</label>
+          <select id="f0-cleanout"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f0-flue-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Flue Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-flue-photos').click()">
+        <input type="file" id="f0-flue-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-flue-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> flue photos</div>
+      </div>
+      <div class="photo-grid" id="f0-flue-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Chimney Exterior Inspection">
+    <div class="section-header"><span class="icon">🏗️</span> Chimney Exterior Inspection</div>
+    <div class="section-body">
+
+      <div class="subsection-title">Chimney Cap(s) — Up to 3 Flues</div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 1</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 1</label>
+            <select id="f0-cap1-cond"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 1</label><input type="text" id="f0-cap1-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 1</label><input type="text" id="f0-cap1-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 1</label>
+            <select id="f0-cap1-ext4"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 2 (if applicable)</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 2</label>
+            <select id="f0-cap2-cond"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 2</label><input type="text" id="f0-cap2-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 2</label><input type="text" id="f0-cap2-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 2</label>
+            <select id="f0-cap2-ext4"><option value="">Please Select</option><option>N/A</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 3 (if applicable)</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 3</label>
+            <select id="f0-cap3-cond"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 3</label><input type="text" id="f0-cap3-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 3</label><input type="text" id="f0-cap3-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 3</label>
+            <select id="f0-cap3-ext4"><option value="">Please Select</option><option>N/A</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="fields-grid" style="margin-top:4px">
+        <div class="field"><label>If Multiple Flues: Is 4" Wythe Present?</label>
+          <select id="f0-wythe"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Spark Arrestor</label>
+          <select id="f0-spark"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Needs Attention</option></select>
+        </div>
+      </div>
+
+      <div class="fields-grid" style="margin-top:8px">
+        <div class="field"><label>Are Expansion Joints Present?</label>
+          <select id="f0-expj"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">Masonry</div>
+      <div class="fields-grid cols-3">
+        <div class="field"><label>Masonry Type</label>
+          <select id="f0-mas-type"><option value="">Please Select</option><option>Brick</option><option>Block</option><option>Field Stone</option><option>Stone</option><option>Sided</option><option>Manufactured Veneer</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Height at Short Side</label><input type="text" id="f0-hs"></div>
+        <div class="field"><label>Height at Tall Side</label><input type="text" id="f0-ht"></div>
+        <div class="field"><label>Length</label><input type="text" id="f0-mlen"></div>
+        <div class="field"><label>Width</label><input type="text" id="f0-mwid"></div>
+        <div class="field"><label>3/2/10 Rule</label>
+          <select id="f0-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select>
+          <span class="hint">Chimney must extend 3' from roofline and be 2' higher than anything within 10'.</span>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Masonry Chimney</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Bricks/Stone/Block Missing/Cracked/Spalling/Broken"><div class="check-item-content"><div class="check-item-label">Bricks/Stone/Block Missing/Cracked/Spalling/Broken</div><div class="check-item-desc">Allows water intrusion; can damage chimney structure causing instability.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Mortar Cracked/Deteriorated/Needs Tuckpointing"><div class="check-item-content"><div class="check-item-label">Mortar Cracked/Deteriorated/Needs Tuckpointing</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Vegetation Present"><div class="check-item-content"><div class="check-item-label">Vegetation Present</div><div class="check-item-desc">Damaging to masonry; sign that water is being retained.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Needs Sealant"><div class="check-item-content"><div class="check-item-label">Needs Sealant</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Siding Not in Generally Good Condition"><div class="check-item-content"><div class="check-item-label">Siding Not in Generally Good Condition</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Cricket / Saddle</label>
+          <select id="f0-cricket"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option><option>Not Present</option><option>N/A</option></select>
+          <span class="hint" style="color:var(--accent);font-weight:600">⚠ Required if chimney is 30 inches or wider</span>
+        </div>
+        <div class="field"><label>Flashing</label>
+          <select id="f0-flash2"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Needs Attention</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f0-ext-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Crown / Cover — Masonry Condition</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Wash Crown"><div class="check-item-content"><div class="check-item-label">Wash Crown</div><div class="check-item-desc">Constructed to divert water down face of chimney causing damage, deterioration, and/or water penetration.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Cracked/Deteriorated Crown"><div class="check-item-content"><div class="check-item-label">Cracked/Deteriorated</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Crown Constructed with Mortar"><div class="check-item-content"><div class="check-item-label">Constructed with Mortar</div><div class="check-item-desc">Should be made with concrete to properly protect chimney.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Sealant Failure"><div class="check-item-content"><div class="check-item-label">Sealant Failure</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Chase Cover Condition</label>
+          <select id="f0-chase"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Chase Cover Rusted/Deteriorated</option><option>Chase Cover Not Constructed with Appropriate Non-Combustible Material</option></select>
+        </div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Exterior / Crown Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f0-ext-photos').click()">
+        <input type="file" id="f0-ext-photos" accept="image/*" multiple onchange="handlePhotos(this,'f0-ext-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> exterior / crown photos</div>
+      </div>
+      <div class="photo-grid" id="f0-ext-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Factory Built Chimney">
+    <div class="section-header"><span class="icon">🏭</span> Factory Built Chimney (if applicable)</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Height</label><input type="text" id="f0-fbc-ht"></div>
+        <div class="field"><label>3/2/10 Rule</label>
+          <select id="f0-fbc-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field"><label>Type</label><input type="text" id="f0-fbc-type"></div>
+        <div class="field"><label>Exterior Diameter</label><input type="text" id="f0-fbc-dia"></div>
+        <div class="field"><label>Exterior Diameter of Chase / Play</label><input type="text" id="f0-fbc-chase-dia" placeholder="inches"></div>
+        <div class="field"><label>Chimney Appropriate to Appliance</label>
+          <select id="f0-fbc-appr"><option value="">Please Select</option><option>Yes</option><option>No</option><option>More Information Needed</option></select>
+        </div>
+        <div class="field"><label>Chimney Support Brackets</label>
+          <select id="f0-fbc-brkt"><option value="">Please Select</option><option>Present</option><option>Not Present</option><option>In Need of Repair</option><option>N/A</option></select>
+        </div>
+        <div class="field span-2"><label>Flue Flashing</label>
+          <select id="f0-flash"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Missing Boot Flashing</option><option>Missing Collar Flashing</option><option>N/A</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Next Service">
+    <div class="section-header"><span class="icon">📅</span> Next Service</div>
+    <div class="section-body">
+      <div class="fields-grid cols-1">
+        <div class="field">
+          <div style="margin-bottom:14px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:4px;padding:12px 16px;"><p style="font-size:13px;font-weight:600;color:var(--text);line-height:1.6;">⚠ The NFPA states all chimneys, fireplaces, and vents shall be inspected at least once yearly and cleaned at an accumulation of 1/8&quot; of build-up.<br><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;font-weight:700">—NFPA 211.14.2</span></p></div>
+          <label>Therefore, the next inspection date recommended is</label>
+          <input type="date" id="f0-next" style="margin-top:6px">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Customer Verification">
+    <div class="section-header"><span class="icon">✍️</span> Customer Verification</div>
+    <div class="section-body">
+      <label class="check-item" style="margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;">
+        <input type="checkbox" id="f0-not-home" value="Customer Not Home at Time of Service">
+        <div class="check-item-content"><div class="check-item-label" style="font-size:14px;font-weight:600;">Customer Not Home at Time of Service</div></div>
+      </label>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;padding:12px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);">Neuens Chimney Service LLC has explained, and I now fully understand the apparent condition of the woodburning appliance, chimney, or venting system at this time. A visual inspection was performed. Since hidden or concealed defects and conditions of use are beyond the control of Neuens Chimney Service LLC, I understand no guarantee or warranty of fire safety of any appliance has been given or implied.</p>
+      <div class="sig-wrap">
+        <canvas class="sig-canvas" id="f0-sig" width="800" height="140"></canvas>
+        <div class="sig-controls"><span>Sign above</span><button class="sig-clear" onclick="clearSig('f0-sig')">Clear Signature</button></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /form-0 -->
+
+<!-- ===== FORM 2: FREE STANDING APPLIANCE ===== -->
+<div class="form-container" id="form-1">
+  <div class="form-header">
+    <div class="form-header-left"><h1>Free Standing Appliance Inspection</h1><p>CSIA Certified · Neuens Chimney Service LLC</p></div>
+    <button class="download-btn" onclick="downloadPDF(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save Report</button>
+  </div>
+  <div class="section" data-section="General Information">
+    <div class="section-header"><span class="icon">📋</span> General Information</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Date</label><input type="date" id="f1-date" oninput="setNextDate('f1')"></div>
+        <div class="field"><label>Technician</label>
+          <select id="f1-tech">
+            <option value="">Please Select</option>
+            <option>Katie Neuens: CSIA Certification # 11688</option>
+            <option>Ryan Walker: CSIA Certification # 12731</option>
+          </select>
+        </div>
+        <div class="field"><label>Level of Inspection</label>
+          <select id="f1-level">
+            <option value="">Please Select</option>
+            <option>Level 1 Inspection with aspects of Level 2</option>
+            <option>Level 2 Inspection</option>
+            <option>Level 3 Inspection</option>
+          </select>
+        </div>
+        <div class="field"><label>Client Name</label><input type="text" id="f1-client" placeholder="First Last"></div>
+        <div class="field span-2"><label>Property Address</label><input type="text" id="f1-addr1" placeholder="Street Address" style="margin-bottom:6px"><input type="text" id="f1-addr2" placeholder="City, State, Zip"></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Issues or Concerns with Your System?</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Drafting Problems / Smoke Coming In While Burning"><div class="check-item-content"><div class="check-item-label">Drafting Problems / Smoke Coming In While Burning</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Water Leaking"><div class="check-item-content"><div class="check-item-label">Water Leaking</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Visible Damage to Exterior Chimney"><div class="check-item-content"><div class="check-item-label">Visible Damage to Exterior Chimney</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gasket / Door Issues"><div class="check-item-content"><div class="check-item-label">Gasket / Door Issues</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Other"><div class="check-item-content"><div class="check-item-label">Other</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f1-gi-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Manual Present"><div class="check-item-content"><div class="check-item-label">Manual Present</div></div></label>
+      </div>
+    </div>
+  </div>
+  <div class="section" data-section="Appliance">
+    <div class="section-header"><span class="icon">🔥</span> Appliance</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Make / Model</label><input type="text" id="f1-model"></div>
+        <div class="field"><label>UL Listing Plate</label><input type="text" id="f1-ul" placeholder="Plate number or description"></div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Appliance</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Rust Present"><div class="check-item-content"><div class="check-item-label">Rust Present</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Warping Present"><div class="check-item-content"><div class="check-item-label">Warping Present</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Baffle/Insulation Missing/Damaged"><div class="check-item-content"><div class="check-item-label">Baffle/Insulation Missing/Damaged</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Fire Bricks Cracked/Deteriorated"><div class="check-item-content"><div class="check-item-label">Fire Bricks Cracked/Deteriorated</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Door Seal Missing/Not Tightly Sealed"><div class="check-item-content"><div class="check-item-label">Door Seal Missing/Not Tightly Sealed</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Catalytic Converter Damaged/Missing"><div class="check-item-content"><div class="check-item-label">Catalytic Converter Damaged/Missing</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Secondary Air Tubes Contain Cracks/Holes"><div class="check-item-content"><div class="check-item-label">Secondary Air Tubes Contain Cracks/Holes</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f1-app-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Appliance Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f1-app-photos').click()">
+        <input type="file" id="f1-app-photos" accept="image/*" multiple onchange="handlePhotos(this,'f1-app-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> appliance photos</div>
+      </div>
+      <div class="photo-grid" id="f1-app-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Appliance Clearances / Floor Protection">
+    <div class="section-header"><span class="icon">📐</span> Appliance Clearances / Floor Protection</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Does Appliance Meet Minimum Clearances?</label>
+          <select id="f1-clearances-met"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+          <span class="hint">36" surrounding / 12" with proper shielding</span>
+        </div>
+        <div class="field"><label>Heat Shield on Combustible Walls</label>
+          <select id="f1-shield"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>Yes: Does Not Meet Industry Standards</option><option>No</option></select>
+          <span class="hint">Requires 1" airspace behind and at floor. Reduces clearances 66%</span>
+        </div>
+        <div class="field"><label>Back Measurement</label><input type="text" id="f1-back"></div>
+        <div class="field"><label>Side Measurements</label><input type="text" id="f1-sides"></div>
+        <div class="field"><label>Mantle</label><input type="text" id="f1-mantle"></div>
+        <div class="field"><label>Floor Back</label><input type="text" id="f1-fb"></div>
+        <div class="field"><label>Floor Front</label><input type="text" id="f1-ff"></div>
+        <div class="field"><label>Floor Sides</label><input type="text" id="f1-fs"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Connection Pipe">
+    <div class="section-header"><span class="icon">⚙️</span> Connection Pipe</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Type</label>
+          <select id="f1-cp-type"><option value="">Please Select</option><option>Single Wall</option><option>Double Wall</option></select>
+        </div>
+        <div class="field"><label>Size</label>
+          <select id="f1-cp-size"><option value="">Please Select</option><option>6"</option><option>7"</option><option>8"</option><option>10"</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Back Clearance</label><input type="text" id="f1-cpb"></div>
+        <div class="field"><label>Sides Clearance</label><input type="text" id="f1-cps"></div>
+        <div class="field"><label>Ceiling Clearance</label><input type="text" id="f1-cpc"></div>
+        <div class="field"><label>Min Clearances Met?</label>
+          <select id="f1-cpmeet"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+          <span class="hint">Single Wall: 18" wall/ceiling. Double Wall: 6" wall/8" ceiling</span>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Connection Pipe</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Connection Pipe: Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Connection Pipe: Contains Rust"><div class="check-item-content"><div class="check-item-label">Contains Rust</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Connection Pipe: Contains Holes / Seems Not Intact"><div class="check-item-content"><div class="check-item-label">Contains Holes / Seems Not Intact</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Connection Pipe: Installed Incorrectly"><div class="check-item-content"><div class="check-item-label">Installed Incorrectly</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Connection Joints</label>
+          <select id="f1-joints"><option value="">Please Select</option><option>Secure with 3 screws</option><option>Missing screws</option><option>3 screws at each joint</option></select>
+        </div>
+        <div class="field"><label>Transition Type</label>
+          <select id="f1-trans"><option value="">Please Select</option><option>Ceiling Support Box</option><option>Masonry Thimble</option><option>Insulated Wall Thimble</option></select>
+        </div>
+        <div class="field"><label>General Condition of Transition</label>
+          <select id="f1-trans-cond"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Missing</option><option>Not Appropriate to Appliance</option><option>N/A</option></select>
+        </div>
+        <div class="field"><label>Offsets/Rise/Slope</label>
+          <select id="f1-offset"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option></select>
+          <span class="hint">Max 2 elbows. Slope: 1/4" per ft downward toward appliance.</span>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">Accessories</div>
+      <div class="check-group" style="flex-direction:row;flex-wrap:wrap;gap:8px">
+        <label class="check-item" style="flex:none"><input type="checkbox" value="Barometric Damper"><div class="check-item-content"><div class="check-item-label">Barometric Damper</div></div></label>
+        <label class="check-item" style="flex:none"><input type="checkbox" value="Throat Damper"><div class="check-item-content"><div class="check-item-label">Throat Damper</div></div></label>
+        <label class="check-item" style="flex:none"><input type="checkbox" value="Heat Reclaimer"><div class="check-item-content"><div class="check-item-label">Heat Reclaimer</div></div></label>
+      </div>
+      <div class="fields-grid" style="margin-top:12px">
+        <div class="field"><label>General Condition of Accessory</label>
+          <select id="f1-acc-cond"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="f1-cp-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Chimney Flue">
+    <div class="section-header"><span class="icon">🔧</span> Chimney Flue</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field span-2"><label>Type of Flue</label>
+          <select id="f1-flue-kind"><option value="">Please Select</option><option>Clay Tile</option><option>Flexible Stainless / Aluminum</option><option>Rigid Stainless / Aluminum</option></select>
+          <span class="hint" style="color:var(--red);font-weight:600;margin-top:3px;">⚠ Wood burning inserts CANNOT be vented to clay tile</span>
+        </div>
+        <div class="field"><label>Flue Type</label>
+          <select id="f1-flue-type"><option value="">Please Select</option><option>Clay Tile</option><option>Cast Masonry</option><option>Flex</option><option>Rigid</option><option>No Liner Present</option></select>
+        </div>
+        <div class="field"><label>Int. Dimensions / Length×Width</label><input type="text" id="f1-flue-dim"></div>
+        <div class="field"><label>Height of Flue</label><input type="text" id="f1-flue-ht"></div>
+        <div class="field"><label>Liner Appropriate for Appliance</label>
+          <select id="f1-liner-appr"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Flue Appropriately Sized?</label>
+          <select id="f1-flue-sized"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Insulation Present</label>
+          <select id="f1-insul"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Unknown</option></select>
+        </div>
+        <div class="field"><label>Level of Cleanliness: Soot</label>
+          <select id="f1-soot"><option value="">Please Select</option><option>Light — less than 1/8"</option><option>Moderate — 1/8" or more</option><option>Significant</option></select>
+        </div>
+        <div class="field"><label>Level of Cleanliness: Creosote</label>
+          <select id="f1-creo"><option value="">Please Select</option><option>1st Degree</option><option>2nd Degree</option><option>3rd Degree</option><option>Ignited</option></select>
+        </div>
+        <div class="field span-2"><label>Flue Blockages / Obstructions</label><textarea id="f1-block" placeholder="Describe any blockages..."></textarea></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Flue Tile General Condition</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Broken Flue Tiles"><div class="check-item-content"><div class="check-item-label">Broken Flue Tiles</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Misaligned Flue Tiles"><div class="check-item-content"><div class="check-item-label">Misaligned Flue Tiles</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Spalling/Flaking Tiles"><div class="check-item-content"><div class="check-item-label">Spalling/Flaking Tiles</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Missing Mortar Joints"><div class="check-item-content"><div class="check-item-label">Missing Mortar Joints</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Excessive Offset Present"><div class="check-item-content"><div class="check-item-label">Excessive Offset Present</div></div></label>
+      </div>
+      <hr>
+      <div class="subsection-title">Flex/Rigid Flue Condition</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards (Flex)"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Discoloration/Rust (Flex)"><div class="check-item-content"><div class="check-item-label">Discoloration/Rust</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Joint Not Secure/Disconnected (Flex)"><div class="check-item-content"><div class="check-item-label">Joint Not Secure/Disconnected</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Protrusion (Flex)"><div class="check-item-content"><div class="check-item-label">Protrusion</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Warping (Flex)"><div class="check-item-content"><div class="check-item-label">Warping</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Flue Cleanout</label>
+          <select id="f1-cleanout"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="f1-flue-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Flue Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f1-flue-photos').click()">
+        <input type="file" id="f1-flue-photos" accept="image/*" multiple onchange="handlePhotos(this,'f1-flue-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> flue photos</div>
+      </div>
+      <div class="photo-grid" id="f1-flue-pg"></div>
+    </div>
+  </div>
+
+  <div class="section" data-section="Chimney Exterior Inspection">
+    <div class="section-header"><span class="icon">🏗️</span> Chimney Exterior Inspection</div>
+    <div class="section-body">
+      <div class="subsection-title">Chimney Cap(s) — Up to 3 Flues</div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 1</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 1</label>
+            <select id="f1-cap1-cond"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 1</label><input type="text" id="f1-cap1-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 1</label><input type="text" id="f1-cap1-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 1</label>
+            <select id="f1-cap1-ext4"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 2 (if applicable)</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 2</label>
+            <select id="f1-cap2-cond"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 2</label><input type="text" id="f1-cap2-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 2</label><input type="text" id="f1-cap2-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 2</label>
+            <select id="f1-cap2-ext4"><option value="">Please Select</option><option>N/A</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-card-title">Flue 3 (if applicable)</div>
+        <div class="fields-grid cols-4">
+          <div class="field"><label>Cap Condition – Flue 3</label>
+            <select id="f1-cap3-cond"><option value="">Please Select</option><option>N/A</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select>
+          </div>
+          <div class="field"><label>Outside Length – Flue 3</label><input type="text" id="f1-cap3-len" placeholder="inches"></div>
+          <div class="field"><label>Outside Width – Flue 3</label><input type="text" id="f1-cap3-wid" placeholder="inches"></div>
+          <div class="field"><label>4" Above Crown/Cover – Flue 3</label>
+            <select id="f1-cap3-ext4"><option value="">Please Select</option><option>N/A</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="fields-grid" style="margin-top:4px">
+        <div class="field"><label>If Multiple Flues: Is 4" Wythe Present?</label>
+          <select id="f1-wythe"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Spark Arrestor</label>
+          <select id="f1-spark"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Needs Attention</option></select>
+        </div>
+        <div class="field"><label>Are Expansion Joints Present?</label>
+          <select id="f1-expj"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Chimney Type</label>
+          <select id="f1-chim-type"><option value="">Please Select</option><option>Masonry</option><option>Wooden Chase</option><option>Factory Built Chimney</option></select>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">Masonry</div>
+      <div class="fields-grid cols-3">
+        <div class="field"><label>Masonry Type</label>
+          <select id="f1-mas-type"><option value="">Please Select</option><option>Brick</option><option>Block</option><option>Field Stone</option><option>Stone</option><option>Sided</option><option>Manufactured Veneer</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Height at Short Side</label><input type="text" id="f1-hs"></div>
+        <div class="field"><label>Height at Tall Side</label><input type="text" id="f1-ht-side"></div>
+        <div class="field"><label>Length</label><input type="text" id="f1-mlen"></div>
+        <div class="field"><label>Width</label><input type="text" id="f1-mwid"></div>
+        <div class="field"><label>3/2/10 Rule</label>
+          <select id="f1-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select>
+          <span class="hint">Chimney must extend 3' from roofline and be 2' higher than anything within 10'.</span>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Masonry Chimney</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Bricks/Stone/Block Missing/Cracked/Spalling/Broken"><div class="check-item-content"><div class="check-item-label">Bricks/Stone/Block Missing/Cracked/Spalling/Broken</div><div class="check-item-desc">Allows water intrusion; can damage chimney structure causing instability.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Mortar Cracked/Deteriorated/Needs Tuckpointing"><div class="check-item-content"><div class="check-item-label">Mortar Cracked/Deteriorated/Needs Tuckpointing</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Vegetation Present"><div class="check-item-content"><div class="check-item-label">Vegetation Present</div><div class="check-item-desc">Damaging to masonry; sign that water is being retained.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Needs Sealant"><div class="check-item-content"><div class="check-item-label">Needs Sealant</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Siding Not in Generally Good Condition"><div class="check-item-content"><div class="check-item-label">Siding Not in Generally Good Condition</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Cricket / Saddle</label>
+          <select id="f1-cricket"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option><option>Not Present</option><option>N/A</option></select>
+          <span class="hint" style="color:var(--accent);font-weight:600">⚠ Required if chimney is 30 inches or wider</span>
+        </div>
+        <div class="field"><label>Flashing</label>
+          <select id="f1-flash2"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Needs Attention</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f1-ext-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Crown / Cover — Masonry Condition</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Wash Crown"><div class="check-item-content"><div class="check-item-label">Wash Crown</div><div class="check-item-desc">Constructed to divert water down face of chimney causing damage, deterioration, and/or water penetration.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Cracked/Deteriorated Crown"><div class="check-item-content"><div class="check-item-label">Cracked/Deteriorated</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Crown Constructed with Mortar"><div class="check-item-content"><div class="check-item-label">Constructed with Mortar</div><div class="check-item-desc">Should be made with concrete to properly protect chimney.</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Sealant Failure"><div class="check-item-content"><div class="check-item-label">Sealant Failure</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid">
+        <div class="field"><label>Chase Cover Condition</label>
+          <select id="f1-chase"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Chase Cover Rusted/Deteriorated</option><option>Chase Cover Not Constructed with Appropriate Non-Combustible Material</option></select>
+        </div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Exterior / Crown Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f1-ext-photos').click()">
+        <input type="file" id="f1-ext-photos" accept="image/*" multiple onchange="handlePhotos(this,'f1-ext-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> exterior / crown photos</div>
+      </div>
+      <div class="photo-grid" id="f1-ext-pg"></div>
+    </div>
+  </div>
+  <div class="section" data-section="Factory Built Chimney">
+    <div class="section-header"><span class="icon">🏭</span> Factory Built Chimney (if applicable)</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Height</label><input type="text" id="f1-fbc-ht"></div>
+        <div class="field"><label>3/2/10 Rule</label>
+          <select id="f1-fbc-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select>
+        </div>
+        <div class="field"><label>Type</label><input type="text" id="f1-fbc-type"></div>
+        <div class="field"><label>Exterior Diameter</label><input type="text" id="f1-fbc-dia"></div>
+        <div class="field"><label>Exterior Diameter of Chase / Play</label><input type="text" id="f1-fbc-chase-dia" placeholder="inches"></div>
+        <div class="field"><label>Chimney Appropriate to Appliance</label>
+          <select id="f1-fbc-appr"><option value="">Please Select</option><option>Yes</option><option>No</option><option>More Information Needed</option></select>
+        </div>
+        <div class="field"><label>Chimney Support Brackets</label>
+          <select id="f1-fbc-brkt"><option value="">Please Select</option><option>Present</option><option>Not Present</option><option>In Need of Repair</option><option>N/A</option></select>
+        </div>
+        <div class="field"><label>Flue Flashing</label>
+          <select id="f1-fbc-flash"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Needs Attention</option><option>N/A</option></select>
+        </div>
+        <div class="field span-2"><label>Notes</label><textarea id="f1-fbc-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+    </div>
+  </div>
+  <div class="section" data-section="Next Service">
+    <div class="section-header"><span class="icon">📅</span> Next Service</div>
+    <div class="section-body">
+      <div class="fields-grid cols-1">
+        <div class="field">
+          <div style="margin-bottom:14px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:4px;padding:12px 16px;"><p style="font-size:13px;font-weight:600;color:var(--text);line-height:1.6;">⚠ The NFPA states all chimneys, fireplaces, and vents shall be inspected at least once yearly and cleaned at an accumulation of 1/8&quot; of build-up.<br><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;font-weight:700">—NFPA 211.14.2</span></p></div>
+          <label>Therefore, the next inspection date recommended is</label>
+          <input type="date" id="f1-next" style="margin-top:6px">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section" data-section="Customer Verification">
+    <div class="section-header"><span class="icon">✍️</span> Customer Verification</div>
+    <div class="section-body">
+      <label class="check-item" style="margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;">
+        <input type="checkbox" id="f1-not-home" value="Customer Not Home at Time of Service">
+        <div class="check-item-content"><div class="check-item-label" style="font-size:14px;font-weight:600;">Customer Not Home at Time of Service</div></div>
+      </label>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;padding:12px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);">Neuens Chimney Service LLC has explained, and I now fully understand the apparent condition of the woodburning appliance, chimney, or venting system at this time. A visual inspection was performed. Since hidden or concealed defects and conditions of use are beyond the control of Neuens Chimney Service LLC, I understand no guarantee or warranty of fire safety of any appliance has been given or implied.</p>
+      <div class="sig-wrap">
+        <canvas class="sig-canvas" id="f1-sig" width="800" height="140"></canvas>
+        <div class="sig-controls"><span>Sign above</span><button class="sig-clear" onclick="clearSig('f1-sig')">Clear Signature</button></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /form-1 -->
+
+
+
+<!-- ===== FORM 3: FACTORY BUILT FIREPLACE ===== -->
+<div class="form-container" id="form-2">
+  <div class="form-header">
+    <div class="form-header-left"><h1>Factory Built Fireplace Inspection</h1><p>CSIA Certified · Neuens Chimney Service LLC</p></div>
+    <button class="download-btn" onclick="downloadPDF(2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save Report</button>
+  </div>
+    <div class="section" data-section="General Information">
+    <div class="section-header"><span class="icon">📋</span> General Information</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Date</label><input type="date" id="f2-date" oninput="setNextDate('f2')"></div>
+        <div class="field"><label>Technician</label>
+          <select id="f2-tech">
+            <option value="">Please Select</option>
+            <option>Katie Neuens: CSIA Certification # 11688</option>
+            <option>Ryan Walker: CSIA Certification # 12731</option>
+          </select>
+        </div>
+        <div class="field"><label>Level of Inspection</label>
+          <select id="f2-level">
+            <option value="">Please Select</option>
+            <option>Level 1 Inspection with aspects of Level 2</option>
+            <option>Level 2 Inspection</option>
+            <option>Level 3 Inspection</option>
+          </select>
+        </div>
+        <div class="field"><label>Client Name</label><input type="text" id="f2-name" placeholder="First Last"></div>
+        <div class="field span-2"><label>Property Address</label><input type="text" id="f2-addr1" placeholder="Street Address" style="margin-bottom:6px"><input type="text" id="f2-addr2" placeholder="City, State, Zip"></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Issues or Concerns with Your System?</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Drafting Problems / Smoke Coming In While Burning"><div class="check-item-content"><div class="check-item-label">Drafting Problems / Smoke Coming In While Burning</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Water Leaking"><div class="check-item-content"><div class="check-item-label">Water Leaking</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Visible Damage to Exterior Chimney"><div class="check-item-content"><div class="check-item-label">Visible Damage to Exterior Chimney</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gasket / Door Issues"><div class="check-item-content"><div class="check-item-label">Gasket / Door Issues</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Other"><div class="check-item-content"><div class="check-item-label">Other</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f2-gi-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Manual Present"><div class="check-item-content"><div class="check-item-label">Manual Present</div></div></label>
+      </div>
+    </div>
+  </div>
+    <div class="section" data-section="Appliance">
+    <div class="section-header"><span class="icon">🔥</span> Appliance</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Make / Model</label><input type="text" id="f2-model"></div>
+        <div class="field"><label>UL Listing Plate Present</label>
+          <select id="f2-ul"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Damper</label>
+          <select id="f2-damper"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option><option>Not Present</option></select>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Appliance</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Doors Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Doors Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Spark Screen Curtain Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Spark Screen Curtain Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Blower Motor Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Blower Motor Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Warping/Rust Present"><div class="check-item-content"><div class="check-item-label">Warping/Rust Present</div></div></label>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Firebox</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Firebox Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Refractory Panels/Firebrick Cracked/Damaged"><div class="check-item-content"><div class="check-item-label">Refractory Panels/Firebrick Cracked/Damaged</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Insulation Plate/Blanket Damaged or Missing"><div class="check-item-content"><div class="check-item-label">Insulation Plate/Blanket Damaged or Missing</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Secondary Heat Tubes Cracked/Damaged"><div class="check-item-content"><div class="check-item-label">Secondary Heat Tubes Cracked/Damaged</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Cracks in Firebox"><div class="check-item-content"><div class="check-item-label">Cracks in Firebox</div></div></label>
+      </div>
+      <hr>
+      <div class="check-group" style="margin-bottom:12px">
+        <label class="check-item"><input type="checkbox" value="Manufacture Plate Found, Picture Taken"><div class="check-item-content"><div class="check-item-label">Manufacture Plate Found, Picture Taken</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Manufacture Plate Not Found"><div class="check-item-content"><div class="check-item-label">Manufacture Plate Not Found</div></div></label>
+      </div>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f2-app-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Appliance / Firebox Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f2-app-photos').click()">
+        <input type="file" id="f2-app-photos" accept="image/*" multiple onchange="handlePhotos(this,'f2-app-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> appliance/firebox photos</div>
+      </div>
+      <div class="photo-grid" id="f2-app-pg"></div>
+    </div>
+  </div>
+  <div class="section" data-section="Hearth"><div class="section-header"><span class="icon">⬜</span> Hearth</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Hearth Extension Front</label><input type="text" id="f2-he-front" placeholder="inches"><span class="hint">Min 16" front; 20" for openings &gt;6 sf</span></div><div class="field"><label>Hearth Extension Sides</label><input type="text" id="f2-he-sides" placeholder="inches"><span class="hint">Min 8" sides; 12" for openings &gt;6 sf</span></div><div class="field"><label>Min Clearance to Combustibles Met</label><select id="f2-he-clear"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field span-2"><label>General Condition of Hearth Extension</label><textarea id="f2-he-cond" placeholder="Describe condition..."></textarea></div><div class="field"><label>Distance to Mantle</label><input type="text" id="f2-mantle"></div><div class="field"><label>Clearance to Trim</label><input type="text" id="f2-trim"><span class="hint">Min 6"; within 12" cannot project &gt;1/8" per inch</span></div><div class="field"><label>Min Clearance to Combustible Trim Met</label><select id="f2-trim-meet"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field span-2"><label>Notes</label><textarea id="f2-hearth-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Hearth Photos</div><div class="photo-upload-area" onclick="document.getElementById('f2-hearth-photos').click()"><input type="file" id="f2-hearth-photos" accept="image/*" multiple onchange="handlePhotos(this,'f2-hearth-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> hearth photos</div></div><div class="photo-grid" id="f2-hearth-pg"></div></div></div>
+    <div class="section" data-section="Chimney Flue">
+    <div class="section-header"><span class="icon">🔧</span> Chimney Flue</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field span-2"><label>Type of Flue</label>
+          <select id="f2-flue-kind"><option value="">Please Select</option><option>Clay Tile</option><option>Flexible Stainless / Aluminum</option><option>Rigid Stainless / Aluminum</option></select>
+          <span class="hint" style="color:var(--red);font-weight:600;margin-top:3px;">⚠ Wood burning inserts CANNOT be vented to clay tile</span>
+        </div>
+        <div class="field"><label>Connection to Flue</label><select id="f2-conn"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Not fully connected</option><option>Contains Gap/Perforation</option></select></div><div class="field"><label>Interior Dimension</label><input type="text" id="f2-flue-dim"></div><div class="field"><label>Height of Flue</label><input type="text" id="f2-flue-ht"></div><div class="field"><label>Liner Appropriate for Appliance</label><select id="f2-liner-appr"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Flue Appropriately Sized?</label><select id="f2-flue-sized"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Insulation Present</label><select id="f2-insul"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Unknown</option></select></div><div class="field"><label>Level of Cleanliness: Soot</label><select id="f2-soot"><option value="">Please Select</option><option>Light — less than 1/8"</option><option>Moderate — 1/8" or more</option><option>Significant</option></select></div><div class="field"><label>Level of Cleanliness: Creosote</label><select id="f2-creo"><option value="">Please Select</option><option>1st Degree</option><option>2nd Degree</option><option>3rd Degree</option><option>Ignited</option></select></div>
+        <div class="field span-2"><label>Flue Blockages / Obstructions</label><textarea id="f2-block" placeholder="Describe any blockages..."></textarea></div></div><hr><div class="subsection-title">Flex/Rigid Flue General Condition</div><div class="check-group"><label class="check-item"><input type="checkbox" value="Meets Industry Standards (Flex)"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Discoloration/Rust (Flex)"><div class="check-item-content"><div class="check-item-label">Discoloration/Rust</div></div></label><label class="check-item"><input type="checkbox" value="Joint Not Secure/Disconnected (Flex)"><div class="check-item-content"><div class="check-item-label">Joint Not Secure/Disconnected</div></div></label><label class="check-item"><input type="checkbox" value="Protrusion (Flex)"><div class="check-item-content"><div class="check-item-label">Protrusion</div></div></label></div><hr><div class="fields-grid cols-1"><div class="field"><label>Notes</label><textarea id="f2-flue-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Flue Photos</div><div class="photo-upload-area" onclick="document.getElementById('f2-flue-photos').click()"><input type="file" id="f2-flue-photos" accept="image/*" multiple onchange="handlePhotos(this,'f2-flue-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> flue photos</div></div><div class="photo-grid" id="f2-flue-pg"></div></div></div>
+  <div class="section" data-section="Chimney Exterior Inspection"><div class="section-header"><span class="icon">🏗️</span> Chimney Exterior Inspection</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Flue Extends Min 4" Above Crown/Cover</label><select id="f2-ext4"><option value="">Please Select</option><option>Yes</option><option>No</option><option>N/A</option></select></div><div class="field"><label>Flue Flashing</label><select id="f2-flash"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Needs Attention</option><option>N/A</option></select></div><div class="field"><label>Chimney Cap</label><select id="f2-cap"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select></div><div class="field"><label>Spark Arrestor</label><select id="f2-spark"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Needs Attention</option></select></div><div class="field"><label>Chimney Type</label><select id="f2-chim-type"><option value="">Please Select</option><option>Masonry</option><option>Wooden Chase</option><option>Factory Built Chimney</option></select></div></div><hr><div class="subsection-title">Crown/Cover – Masonry</div><div class="check-group"><label class="check-item"><input type="checkbox" value="N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label><label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Wash Crown"><div class="check-item-content"><div class="check-item-label">Wash Crown</div></div></label><label class="check-item"><input type="checkbox" value="Cracked/Deteriorated Crown"><div class="check-item-content"><div class="check-item-label">Cracked/Deteriorated</div></div></label><label class="check-item"><input type="checkbox" value="Constructed with Mortar"><div class="check-item-content"><div class="check-item-label">Constructed with Mortar</div></div></label><label class="check-item"><input type="checkbox" value="Sealant Failure"><div class="check-item-content"><div class="check-item-label">Sealant Failure</div></div></label></div><hr><div class="subsection-title">Chase Cover</div><div class="check-group"><label class="check-item"><input type="checkbox" value="Chase Cover N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Rusted/Deteriorated"><div class="check-item-content"><div class="check-item-label">Rusted/Deteriorated</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Not Non-Combustible Material"><div class="check-item-content"><div class="check-item-label">Not Constructed with Appropriate Non-Combustible Material</div></div></label></div><hr><div class="fields-grid"><div class="field"><label>Expansion Joints Present</label><select id="f2-expj"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Notes</label><textarea id="f2-ext-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Exterior Photos</div><div class="photo-upload-area" onclick="document.getElementById('f2-ext-photos').click()"><input type="file" id="f2-ext-photos" accept="image/*" multiple onchange="handlePhotos(this,'f2-ext-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> exterior photos</div></div><div class="photo-grid" id="f2-ext-pg"></div></div></div>
+  <div class="section" data-section="Factory Built Chimney"><div class="section-header"><span class="icon">🏭</span> Factory Built Chimney (if applicable)</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Height</label><input type="text" id="f2-fbc-ht"></div><div class="field"><label>3/2/10 Rule</label><select id="f2-fbc-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select></div><div class="field"><label>Type</label><input type="text" id="f2-fbc-type"></div><div class="field"><label>Exterior Diameter</label><input type="text" id="f2-fbc-dia"></div><div class="field"><label>Chimney Appropriate to Appliance</label><select id="f2-fbc-appr"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Need More Information</option></select></div><div class="field"><label>Chimney Support Brackets</label><select id="f2-fbc-brkt"><option value="">Please Select</option><option>Present</option><option>Not Present</option><option>In Need of Repair</option><option>N/A</option></select></div><div class="field span-2"><label>Notes</label><textarea id="f2-fbc-notes" placeholder="Additional notes..."></textarea></div></div></div></div>
+    <div class="section" data-section="Next Service">
+    <div class="section-header"><span class="icon">📅</span> Next Service</div>
+    <div class="section-body">
+      <div class="fields-grid cols-1">
+        <div class="field">
+          <div style="margin-bottom:14px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:4px;padding:12px 16px;"><p style="font-size:13px;font-weight:600;color:var(--text);line-height:1.6;">⚠ The NFPA states all chimneys, fireplaces, and vents shall be inspected at least once yearly and cleaned at an accumulation of 1/8&quot; of build-up.<br><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;font-weight:700">—NFPA 211.14.2</span></p></div>
+          <label>Therefore, the next inspection date recommended is</label>
+          <input type="date" id="f2-next" style="margin-top:6px">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section" data-section="Customer Verification"><div class="section-header"><span class="icon">✍️</span> Customer Verification</div><div class="section-body"><label class="check-item" style="margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;"><input type="checkbox" id="f2-not-home" value="Customer Not Home at Time of Service"><div class="check-item-content"><div class="check-item-label" style="font-size:14px;font-weight:600;">Customer Not Home at Time of Service</div></div></label><p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;padding:12px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);">Neuens Chimney Service LLC has explained, and I now fully understand the apparent condition of the woodburning appliance, chimney, or venting system at this time. A visual inspection was performed. Since hidden or concealed defects and conditions of use are beyond the control of Neuens Chimney Service LLC, I understand no guarantee or warranty of fire safety of any appliance has been given or implied.</p><div class="sig-wrap"><canvas class="sig-canvas" id="f2-sig" width="800" height="140"></canvas><div class="sig-controls"><span>Sign above</span><button class="sig-clear" onclick="clearSig('f2-sig')">Clear Signature</button></div></div></div></div>
+</div><!-- /form-2 -->
+
+<!-- ===== FORM 4: WOOD BURNING INSERT ===== -->
+<div class="form-container" id="form-3">
+  <div class="form-header">
+    <div class="form-header-left"><h1>Wood Burning Insert Inspection</h1><p>CSIA Certified · Neuens Chimney Service LLC</p></div>
+    <button class="download-btn" onclick="downloadPDF(3)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save Report</button>
+  </div>
+    <div class="section" data-section="General Information">
+    <div class="section-header"><span class="icon">📋</span> General Information</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Date</label><input type="date" id="f3-date" oninput="setNextDate('f3')"></div>
+        <div class="field"><label>Technician</label>
+          <select id="f3-tech">
+            <option value="">Please Select</option>
+            <option>Katie Neuens: CSIA Certification # 11688</option>
+            <option>Ryan Walker: CSIA Certification # 12731</option>
+          </select>
+        </div>
+        <div class="field"><label>Level of Inspection</label>
+          <select id="f3-level">
+            <option value="">Please Select</option>
+            <option>Level 1 Inspection with aspects of Level 2</option>
+            <option>Level 2 Inspection</option>
+            <option>Level 3 Inspection</option>
+          </select>
+        </div>
+        <div class="field"><label>Client Name</label><input type="text" id="f3-name" placeholder="First Last"></div>
+        <div class="field span-2"><label>Property Address</label><input type="text" id="f3-addr1" placeholder="Street Address" style="margin-bottom:6px"><input type="text" id="f3-addr2" placeholder="City, State, Zip"></div>
+      </div>
+      <hr>
+      <div class="subsection-title">Issues or Concerns with Your System?</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Drafting Problems / Smoke Coming In While Burning"><div class="check-item-content"><div class="check-item-label">Drafting Problems / Smoke Coming In While Burning</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Water Leaking"><div class="check-item-content"><div class="check-item-label">Water Leaking</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Visible Damage to Exterior Chimney"><div class="check-item-content"><div class="check-item-label">Visible Damage to Exterior Chimney</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Gasket / Door Issues"><div class="check-item-content"><div class="check-item-label">Gasket / Door Issues</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Other"><div class="check-item-content"><div class="check-item-label">Other</div></div></label>
+      </div>
+      <hr>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f3-gi-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <hr>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Manual Present"><div class="check-item-content"><div class="check-item-label">Manual Present</div></div></label>
+      </div>
+    </div>
+  </div>
+    <div class="section" data-section="Appliance">
+    <div class="section-header"><span class="icon">🔥</span> Appliance</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field"><label>Make / Model</label><input type="text" id="f3-model"></div>
+        <div class="field"><label>UL Listing Plate Present</label>
+          <select id="f3-ul"><option value="">Please Select</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Damper</label>
+          <select id="f3-damper"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Does Not Meet Industry Standards</option><option>Not Present</option></select>
+        </div>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Appliance</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Doors Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Doors Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Spark Screen Curtain Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Spark Screen Curtain Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Blower Motor Not in Operational Condition"><div class="check-item-content"><div class="check-item-label">Blower Motor Not in Operational Condition</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Warping/Rust Present"><div class="check-item-content"><div class="check-item-label">Warping/Rust Present</div></div></label>
+      </div>
+      <hr>
+      <div class="subsection-title">General Condition of Firebox</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="Firebox Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Refractory Panels/Firebrick Cracked/Damaged"><div class="check-item-content"><div class="check-item-label">Refractory Panels/Firebrick Cracked/Damaged</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Insulation Plate/Blanket Damaged or Missing"><div class="check-item-content"><div class="check-item-label">Insulation Plate/Blanket Damaged or Missing</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Secondary Heat Tubes Cracked/Damaged"><div class="check-item-content"><div class="check-item-label">Secondary Heat Tubes Cracked/Damaged</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Cracks in Firebox"><div class="check-item-content"><div class="check-item-label">Cracks in Firebox</div></div></label>
+      </div>
+      <hr>
+      <div class="check-group" style="margin-bottom:12px">
+        <label class="check-item"><input type="checkbox" value="Manufacture Plate Found, Picture Taken"><div class="check-item-content"><div class="check-item-label">Manufacture Plate Found, Picture Taken</div></div></label>
+        <label class="check-item"><input type="checkbox" value="Manufacture Plate Not Found"><div class="check-item-content"><div class="check-item-label">Manufacture Plate Not Found</div></div></label>
+      </div>
+      <div class="fields-grid cols-1">
+        <div class="field"><label>Notes</label><textarea id="f3-app-notes" placeholder="Additional notes..."></textarea></div>
+      </div>
+      <div class="photo-section-label" style="margin-top:12px">📷 Appliance / Firebox Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('f3-app-photos').click()">
+        <input type="file" id="f3-app-photos" accept="image/*" multiple onchange="handlePhotos(this,'f3-app-pg')">
+        <div class="photo-upload-icon">📸</div>
+        <div class="photo-upload-text"><strong>Click to upload</strong> appliance/firebox photos</div>
+      </div>
+      <div class="photo-grid" id="f3-app-pg"></div>
+    </div>
+  </div>
+  <div class="section" data-section="Hearth"><div class="section-header"><span class="icon">⬜</span> Hearth</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Hearth Extension Front</label><input type="text" id="f3-he-front" placeholder="inches"><span class="hint">Min 16" front; 20" for openings &gt;6 sf</span></div><div class="field"><label>Hearth Extension Sides</label><input type="text" id="f3-he-sides" placeholder="inches"><span class="hint">Min 8" sides; 12" for openings &gt;6 sf</span></div><div class="field"><label>Min Clearance to Combustibles Met</label><select id="f3-he-clear"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field span-2"><label>General Condition of Hearth Extension</label><textarea id="f3-he-cond" placeholder="Describe condition..."></textarea></div><div class="field"><label>Distance to Mantle</label><input type="text" id="f3-mantle"></div><div class="field"><label>Clearance to Trim</label><input type="text" id="f3-trim"><span class="hint">Min 6"; within 12" cannot project &gt;1/8" per inch</span></div><div class="field"><label>Min Clearance to Combustible Trim Met</label><select id="f3-trim-meet"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field span-2"><label>Notes</label><textarea id="f3-hearth-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Hearth Photos</div><div class="photo-upload-area" onclick="document.getElementById('f3-hearth-photos').click()"><input type="file" id="f3-hearth-photos" accept="image/*" multiple onchange="handlePhotos(this,'f3-hearth-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> hearth photos</div></div><div class="photo-grid" id="f3-hearth-pg"></div></div></div>
+    <div class="section" data-section="Chimney Flue">
+    <div class="section-header"><span class="icon">🔧</span> Chimney Flue</div>
+    <div class="section-body">
+      <div class="fields-grid">
+        <div class="field span-2"><label>Type of Flue</label>
+          <select id="f3-flue-kind"><option value="">Please Select</option><option>Clay Tile</option><option>Flexible Stainless / Aluminum</option><option>Rigid Stainless / Aluminum</option></select>
+          <span class="hint" style="color:var(--red);font-weight:600;margin-top:3px;">⚠ Wood burning inserts CANNOT be vented to clay tile</span>
+        </div>
+        <div class="field"><label>Connection to Flue</label><select id="f3-conn"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Not fully connected</option><option>Contains Gap/Perforation</option></select></div><div class="field"><label>Interior Dimension</label><input type="text" id="f3-flue-dim"></div><div class="field"><label>Height of Flue</label><input type="text" id="f3-flue-ht"></div><div class="field"><label>Liner Appropriate for Appliance</label><select id="f3-liner-appr"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Flue Appropriately Sized?</label><select id="f3-flue-sized"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Insulation Present</label><select id="f3-insul"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Unknown</option></select></div><div class="field"><label>Level of Cleanliness: Soot</label><select id="f3-soot"><option value="">Please Select</option><option>Light — less than 1/8"</option><option>Moderate — 1/8" or more</option><option>Significant</option></select></div><div class="field"><label>Level of Cleanliness: Creosote</label><select id="f3-creo"><option value="">Please Select</option><option>1st Degree</option><option>2nd Degree</option><option>3rd Degree</option><option>Ignited</option></select></div>
+        <div class="field span-2"><label>Flue Blockages / Obstructions</label><textarea id="f3-block" placeholder="Describe any blockages..."></textarea></div></div><hr><div class="subsection-title">Flex/Rigid Flue General Condition</div><div class="check-group"><label class="check-item"><input type="checkbox" value="Meets Industry Standards (Flex)"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Discoloration/Rust (Flex)"><div class="check-item-content"><div class="check-item-label">Discoloration/Rust</div></div></label><label class="check-item"><input type="checkbox" value="Joint Not Secure/Disconnected (Flex)"><div class="check-item-content"><div class="check-item-label">Joint Not Secure/Disconnected</div></div></label><label class="check-item"><input type="checkbox" value="Protrusion (Flex)"><div class="check-item-content"><div class="check-item-label">Protrusion</div></div></label></div><hr><div class="fields-grid cols-1"><div class="field"><label>Notes</label><textarea id="f3-flue-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Flue Photos</div><div class="photo-upload-area" onclick="document.getElementById('f3-flue-photos').click()"><input type="file" id="f3-flue-photos" accept="image/*" multiple onchange="handlePhotos(this,'f3-flue-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> flue photos</div></div><div class="photo-grid" id="f3-flue-pg"></div></div></div>
+  <div class="section" data-section="Chimney Exterior Inspection"><div class="section-header"><span class="icon">🏗️</span> Chimney Exterior Inspection</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Flue Extends Min 4" Above Crown/Cover</label><select id="f3-ext4"><option value="">Please Select</option><option>Yes</option><option>No</option><option>N/A</option></select></div><div class="field"><label>Flue Flashing</label><select id="f3-flash"><option value="">Please Select</option><option>Meets Industry Standards</option><option>Does Not Meet Industry Standards</option><option>Needs Attention</option><option>N/A</option></select></div><div class="field"><label>Chimney Cap</label><select id="f3-cap"><option value="">Please Select</option><option>Present: Meets Industry Standards</option><option>Present: Contains Rust/Deterioration</option><option>Not Present</option></select></div><div class="field"><label>Spark Arrestor</label><select id="f3-spark"><option value="">Please Select</option><option>N/A</option><option>Meets Industry Standards</option><option>Needs Attention</option></select></div><div class="field"><label>Chimney Type</label><select id="f3-chim-type"><option value="">Please Select</option><option>Masonry</option><option>Wooden Chase</option><option>Factory Built Chimney</option></select></div></div><hr><div class="subsection-title">Crown/Cover – Masonry</div><div class="check-group"><label class="check-item"><input type="checkbox" value="N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label><label class="check-item"><input type="checkbox" value="Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Wash Crown"><div class="check-item-content"><div class="check-item-label">Wash Crown</div></div></label><label class="check-item"><input type="checkbox" value="Cracked/Deteriorated Crown"><div class="check-item-content"><div class="check-item-label">Cracked/Deteriorated</div></div></label><label class="check-item"><input type="checkbox" value="Constructed with Mortar"><div class="check-item-content"><div class="check-item-label">Constructed with Mortar</div></div></label><label class="check-item"><input type="checkbox" value="Sealant Failure"><div class="check-item-content"><div class="check-item-label">Sealant Failure</div></div></label></div><hr><div class="subsection-title">Chase Cover</div><div class="check-group"><label class="check-item"><input type="checkbox" value="Chase Cover N/A"><div class="check-item-content"><div class="check-item-label">N/A</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Meets Industry Standards"><div class="check-item-content"><div class="check-item-label">Meets Industry Standards</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Rusted/Deteriorated"><div class="check-item-content"><div class="check-item-label">Rusted/Deteriorated</div></div></label><label class="check-item"><input type="checkbox" value="Chase Cover Not Non-Combustible Material"><div class="check-item-content"><div class="check-item-label">Not Constructed with Appropriate Non-Combustible Material</div></div></label></div><hr><div class="fields-grid"><div class="field"><label>Expansion Joints Present</label><select id="f3-expj"><option value="">Please Select</option><option>Yes</option><option>No</option></select></div><div class="field"><label>Notes</label><textarea id="f3-ext-notes" placeholder="Additional notes..."></textarea></div></div><div class="photo-section-label" style="margin-top:12px">📷 Exterior Photos</div><div class="photo-upload-area" onclick="document.getElementById('f3-ext-photos').click()"><input type="file" id="f3-ext-photos" accept="image/*" multiple onchange="handlePhotos(this,'f3-ext-pg')"><div class="photo-upload-icon">📸</div><div class="photo-upload-text"><strong>Click to upload</strong> exterior photos</div></div><div class="photo-grid" id="f3-ext-pg"></div></div></div>
+  <div class="section" data-section="Factory Built Chimney"><div class="section-header"><span class="icon">🏭</span> Factory Built Chimney (if applicable)</div><div class="section-body"><div class="fields-grid"><div class="field"><label>Height</label><input type="text" id="f3-fbc-ht"></div><div class="field"><label>3/2/10 Rule</label><select id="f3-fbc-rule"><option value="">Please Select</option><option>Yes: Meets Industry Standards</option><option>No: Does Not Meet Industry Standards</option></select></div><div class="field"><label>Type</label><input type="text" id="f3-fbc-type"></div><div class="field"><label>Exterior Diameter</label><input type="text" id="f3-fbc-dia"></div><div class="field"><label>Chimney Appropriate to Appliance</label><select id="f3-fbc-appr"><option value="">Please Select</option><option>Yes</option><option>No</option><option>Need More Information</option></select></div><div class="field"><label>Chimney Support Brackets</label><select id="f3-fbc-brkt"><option value="">Please Select</option><option>Present</option><option>Not Present</option><option>In Need of Repair</option><option>N/A</option></select></div><div class="field span-2"><label>Notes</label><textarea id="f3-fbc-notes" placeholder="Additional notes..."></textarea></div></div></div></div>
+    <div class="section" data-section="Next Service">
+    <div class="section-header"><span class="icon">📅</span> Next Service</div>
+    <div class="section-body">
+      <div class="fields-grid cols-1">
+        <div class="field">
+          <div style="margin-bottom:14px;background:var(--surface);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:4px;padding:12px 16px;"><p style="font-size:13px;font-weight:600;color:var(--text);line-height:1.6;">⚠ The NFPA states all chimneys, fireplaces, and vents shall be inspected at least once yearly and cleaned at an accumulation of 1/8&quot; of build-up.<br><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;font-weight:700">—NFPA 211.14.2</span></p></div>
+          <label>Therefore, the next inspection date recommended is</label>
+          <input type="date" id="f3-next" style="margin-top:6px">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section" data-section="Customer Verification"><div class="section-header"><span class="icon">✍️</span> Customer Verification</div><div class="section-body"><label class="check-item" style="margin-bottom:14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;"><input type="checkbox" id="f3-not-home" value="Customer Not Home at Time of Service"><div class="check-item-content"><div class="check-item-label" style="font-size:14px;font-weight:600;">Customer Not Home at Time of Service</div></div></label><p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;padding:12px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);">Neuens Chimney Service LLC has explained, and I now fully understand the apparent condition of the woodburning appliance, chimney, or venting system at this time. A visual inspection was performed. Since hidden or concealed defects and conditions of use are beyond the control of Neuens Chimney Service LLC, I understand no guarantee or warranty of fire safety of any appliance has been given or implied.</p><div class="sig-wrap"><canvas class="sig-canvas" id="f3-sig" width="800" height="140"></canvas><div class="sig-controls"><span>Sign above</span><button class="sig-clear" onclick="clearSig('f3-sig')">Clear Signature</button></div></div></div></div>
+</div><!-- /form-3 -->
+
+</div><!-- /.main -->
+<div class="toast" id="toast">✓ Report ready!</div>
+
+<script>
+// ===== LOGO =====
+let logoDataUrl = null;
+function loadLogo(input) {
+  if (!input.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    logoDataUrl = e.target.result;
+    const img = document.getElementById('logo-img');
+    img.src = logoDataUrl; img.style.display = 'block';
+    document.getElementById('logo-ph').style.display = 'none';
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+// ===== FORM SWITCHING =====
+function switchForm(idx) {
+  document.querySelectorAll('.form-container').forEach((f,i) => f.classList.toggle('active', i===idx));
+  document.querySelectorAll('.form-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ===== AUTO DATE FILL =====
+function setNextDate(prefix) {
+  const d = document.getElementById(prefix+'-date').value;
+  if (!d) return;
+  const dt = new Date(d);
+  dt.setFullYear(dt.getFullYear() + 1);
+  const nxt = dt.toISOString().split('T')[0];
+  const el = document.getElementById(prefix+'-next');
+  if (el) el.value = nxt;
+}
+
+// ===== AUTO CALCULATIONS =====
+function calcFireboxArea() {
+  const h = parseFloat(document.getElementById('f0-oh').value)||0;
+  const l = parseFloat(document.getElementById('f0-ol').value)||0;
+  document.getElementById('f0-area').value = (h&&l) ? (h*l).toFixed(1)+' sq in' : '';
+}
+function calcFlueArea() {
+  const len = parseFloat(document.getElementById('f0-flue-len').value)||0;
+  const wid = parseFloat(document.getElementById('f0-flue-wid').value)||0;
+  document.getElementById('f0-flue-area').value = (len&&wid) ? (len*wid).toFixed(1)+' sq in' : '';
+}
+
+// ===== PHOTOS =====
+const photoData = {};
+window.photoData = photoData;
+function handlePhotos(input, gridId) {
+  if (!photoData[gridId]) photoData[gridId] = [];
+  Array.from(input.files).forEach(file => {
+    const r = new FileReader();
+    r.onload = e => { photoData[gridId].push({name:file.name, dataUrl:e.target.result}); renderGrid(gridId); };
+    r.readAsDataURL(file);
+  });
+  input.value = '';
+}
+function renderGrid(gridId) {
+  const g = document.getElementById(gridId); if (!g) return;
+  g.innerHTML = '';
+  (photoData[gridId]||[]).forEach((p,i) => {
+    const d = document.createElement('div'); d.className = 'photo-thumb';
+    d.innerHTML = `<img src="${p.dataUrl}" alt="${p.name}"><button class="remove-photo" onclick="removePhoto('${gridId}',${i})">×</button>`;
+    g.appendChild(d);
+  });
+}
+function removePhoto(gridId, idx) { photoData[gridId].splice(idx,1); renderGrid(gridId); }
+
+// ===== SIGNATURE =====
+function initSig(id) {
+  const c = document.getElementById(id); if (!c) return;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
+  let drawing=false, last=null;
+  function pos(e) {
+    const r=c.getBoundingClientRect(), sx=c.width/r.width, sy=c.height/r.height;
+    return e.touches ? {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy}
+                     : {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+  }
+  c.addEventListener('mousedown',e=>{e.preventDefault();drawing=true;last=pos(e);});
+  c.addEventListener('mousemove',e=>{e.preventDefault();if(!drawing)return;const p=pos(e);ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;});
+  c.addEventListener('mouseup',e=>{e.preventDefault();drawing=false;});
+  c.addEventListener('mouseleave',e=>{e.preventDefault();drawing=false;});
+  c.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;last=pos(e);},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=pos(e);ctx.strokeStyle='#111';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;},{passive:false});
+  c.addEventListener('touchend',e=>{e.preventDefault();drawing=false;});
+}
+function clearSig(id) { const c=document.getElementById(id);const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height); }
+
+// ===== PDF =====
+function getVal(id) { const el=document.getElementById(id); return el?(el.value||'').trim():''; }
+
+const formNames = ['Masonry Fireplace Inspection','Free Standing Appliance Inspection','Factory Built Fireplace Inspection','Wood Burning Insert Inspection'];
+
+async function downloadPDF(formIdx) {
+  const fc = document.getElementById('form-' + formIdx);
+  const prefix = 'f' + formIdx;
+  const dateVal = document.getElementById(prefix+'-date')?.value || '';
+  const client = (document.getElementById(prefix+'-client')?.value || document.getElementById(prefix+'-name')?.value || 'Inspection').trim();
+  const safeClient = client.replace(/[^a-zA-Z0-9_\- ]/g,'').replace(/\s+/g,'_');
+  const safeDate = dateVal || new Date().toISOString().split('T')[0];
+  const filename = safeClient + '_' + safeDate;
+
+  // ── Build report HTML ──────────────────────────────────────────
+  let sections = '';
+  fc.querySelectorAll('.section').forEach(sec => {
+    const sName = (sec.dataset.section || 'Section').toUpperCase();
+    let rows = '';
+
+    // Fields with values
+    sec.querySelectorAll('.field').forEach(f => {
+      const lbl = f.querySelector('label');
+      const inp = f.querySelector('input[type=text],input[type=date],input[type=number],select,textarea');
+      if (lbl && inp) {
+        const v = inp.value ? inp.value.trim() : '';
+        if (v && v !== 'Please Select') {
+          rows += `<tr class="pr-tr"><td class="pr-lbl">${lbl.textContent.trim()}</td><td class="pr-val">${v.replace(/\n/g,'<br>')}</td></tr>`;
+        }
+      }
+    });
+
+    // Checked checkboxes
+    const checks = [];
+    sec.querySelectorAll('input[type=checkbox]:checked').forEach(cb => checks.push('• ' + cb.value));
+    if (checks.length) {
+      rows += `<tr class="pr-tr"><td class="pr-lbl">Conditions Noted</td><td class="pr-val">${checks.join('<br>')}</td></tr>`;
+    }
+
+    // Photos
+    let photoHtml = '';
+    sec.querySelectorAll('[id$="-pg"]').forEach(g => {
+      (photoData[g.id]||[]).forEach(p => {
+        photoHtml += `<img src="${p.dataUrl}" class="pr-photo">`;
+      });
+    });
+    if (photoHtml) rows += `<tr class="pr-tr"><td colspan="2"><div class="pr-photos">${photoHtml}</div></td></tr>`;
+
+    // Signature
+    const sig = sec.querySelector('canvas.sig-canvas');
+    if (sig) {
+      const id = sig.getContext('2d').getImageData(0,0,sig.width,sig.height);
+      let hasSig = false;
+      for(let i=0;i<id.data.length;i+=4){if(id.data[i]<240){hasSig=true;break;}}
+      if (hasSig) rows += `<tr class="pr-tr"><td class="pr-lbl">Customer Signature</td><td class="pr-val"><img src="${sig.toDataURL()}" style="max-width:220px;border:1px solid #ccc;border-radius:3px"></td></tr>`;
+    }
+
+    if (rows) sections += `<div class="pr-sec"><div class="pr-sec-hdr">${sName}</div><table class="pr-table">${rows}</table></div>`;
+  });
+
+  // ── Inject print div into current page and call window.print() ──
+  // This is the ONLY method that reliably works in iOS standalone PWA mode.
+  // iOS will show its native Print dialog → user pinches out → Save as PDF → Files.
+
+  let printDiv = document.getElementById('print-report');
+  if (printDiv) printDiv.remove();
+  printDiv = document.createElement('div');
+  printDiv.id = 'print-report';
+
+  printDiv.innerHTML = `
+    <div class="pr-hdr">
+      <div>
+        <div class="pr-title">${formNames[formIdx].toUpperCase()}</div>
+        <div class="pr-sub">NEUENS CHIMNEY SERVICE LLC · CSIA CERTIFIED INSPECTIONS</div>
+      </div>
+      <div class="pr-meta">${dateVal ? 'Date: '+dateVal+'<br>' : ''}${client ? 'Client: '+client : ''}<br>${filename}</div>
+    </div>
+    <div class="pr-bar"></div>
+    ${sections}
+    <div class="pr-footer"><span>NEUENS CHIMNEY SERVICE LLC | CSIA CERTIFIED</span><span>${formNames[formIdx].toUpperCase()}</span></div>`;
+
+  document.body.appendChild(printDiv);
+
+  // Show instructions overlay first, then print
+  let overlay = document.getElementById('print-overlay');
+  if (overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'print-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:20px;text-align:center';
+  overlay.innerHTML = `
+    <div style="font-family:Impact,Arial,sans-serif;font-size:26px;letter-spacing:2px;color:#d4882a">SAVE AS PDF</div>
+    <div style="font-size:16px;color:#e8e4dc;font-weight:700">${filename}</div>
+    <div style="font-size:13px;color:#aaa;max-width:300px;line-height:1.8">
+      Tap <strong style="color:#fff">Print Report</strong> below.<br>
+      When the print screen opens:<br>
+      <strong style="color:#d4882a">Pinch outward</strong> on the preview<br>
+      to turn it into a PDF,<br>
+      then tap <strong style="color:#fff">Share ⬆ → Save to Files</strong>
+    </div>
+    <button id="do-print-btn" style="background:#d4882a;color:#0f0f0e;border:none;padding:16px 36px;border-radius:8px;font-weight:800;font-size:17px;cursor:pointer;margin-top:8px">🖨 Print Report</button>
+    <button id="cancel-print-btn" style="background:none;border:none;color:#7a7567;font-size:13px;cursor:pointer;text-decoration:underline">Cancel</button>`;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('do-print-btn').onclick = () => {
+    overlay.remove();
+    setTimeout(() => { window.print(); }, 100);
+  };
+  document.getElementById('cancel-print-btn').onclick = () => {
+    overlay.remove();
+    if (printDiv) printDiv.remove();
+  };
+
+  // Clean up print div after printing
+  window.onafterprint = () => { if (printDiv) printDiv.remove(); };
+}
+
+
+document.addEventListener('DOMContentLoaded',()=>{initSig('f0-sig');initSig('f1-sig');initSig('f2-sig');initSig('f3-sig');});
+</script>
+</body>
+</html>
